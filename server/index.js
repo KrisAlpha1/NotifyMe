@@ -9,6 +9,7 @@ const startServer = () => {
   const port = 3020;
 
   app.get("/authorize-bot", async (req, res) => {
+    console.log(process.env.BASE_URL);
     const { token_type, access_token, expires_in, refresh_token } =
       await DiscordApi.requestTokenGrant(
         req.query,
