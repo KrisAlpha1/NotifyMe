@@ -2,6 +2,7 @@ const express = require("express");
 const DiscordApi = require("../api");
 const { writeToFile } = require("../utils/files");
 const store = require("../store");
+require("dotenv").config();
 
 const startServer = () => {
   const app = express();
@@ -11,7 +12,7 @@ const startServer = () => {
     const { token_type, access_token, expires_in, refresh_token } =
       await DiscordApi.requestTokenGrant(
         req.query,
-        "http://localhost:3020/authorize-bot"
+        `${process.env.BASE_URL}/authorize-bot`
       );
     const user = await DiscordApi.getUser(access_token);
     writeToFile((prev) => ({
