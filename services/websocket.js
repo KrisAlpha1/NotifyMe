@@ -34,7 +34,9 @@ class SocketService {
 
     this.socket.on("close", (code, reason) => {
       console.log("Socket connection closed:", code, reason.toString());
-      // this.setupSocket();
+      if (code != 4004) {
+        this.setupSocket();
+      }
     });
   }
 
