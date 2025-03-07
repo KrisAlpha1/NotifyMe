@@ -2,7 +2,12 @@ const express = require("express");
 const DiscordApi = require("../api");
 const { writeToFile, readFromFile } = require("../utils/files");
 const store = require("../store");
+const { getClient } = require("../services/client");
+const SocketService = require("../services/websocket");
 require("dotenv").config();
+var bodyParser = require("body-parser");
+
+const jsonParser = bodyParser.json();
 
 const startServer = () => {
   const app = express();
@@ -37,6 +42,32 @@ const startServer = () => {
 
   app.get("/ping", async (req, res) => {
     return res.status(200).send("Ping!");
+  });
+
+  app.post("/set-access", jsonParser, async (req, res) => {
+    writeToFile((prev) => ({
+      ...req.body,
+    }));
+    return res.status(200).send("Added");
+  });
+
+  app.get("/listen", async (req, res) => {
+    const accessData = await readFromFile();
+    const client = getClient();
+    Object.keys(accessData).forEach((userId) => {
+      if (accessData[userId].socket_token) {
+        const token = accessData[userId].socket_token;
+        client.users.fetch(userId).then((user) => {
+          const Socket = new SocketService({ token, user });
+          Socket.initListeners();
+          // Set socket instance to store
+          store.set("sockets", {
+            [user.id]: Socket,
+          });
+        });
+      }
+    });
+    return res.status(200).send("Success");
   });
 
   app.listen(port, () => {
