@@ -50,7 +50,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
 // setTimeout(() => {
 //   client.channels.fetch("1347325621591605390").then((channel) => {
-//     channel.messages.delete("1347564967196364831");
+//     channel.messages.delete("1347572905889890395");
 //   });
 // }, 1000);
 

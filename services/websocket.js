@@ -20,7 +20,7 @@ class SocketService {
 
   setupSocket() {
     // Instantiate web socket
-    const socket = new WebSocket(
+    this.socket = new WebSocket(
       "wss://gateway.discord.gg/?encoding=json&v=10",
       {
         headers: {
@@ -30,6 +30,15 @@ class SocketService {
     );
     // Set class property
 
+    this.openSocket(this.socket);
+
+    this.socket.on("close", (code, reason) => {
+      console.log("Socket connection closed:", code, reason);
+      this.setupSocket();
+    });
+  }
+
+  openSocket(socket) {
     // Open socket and send identity
     socket.onopen = (tls) => {
       const identify_payload = {
@@ -41,22 +50,17 @@ class SocketService {
         },
       };
       socket.send(JSON.stringify(identify_payload));
+      console.log("Socket connection open:");
     };
 
     this.startMessageListener(socket);
-
-    socket.on("close", (code, reason) => {
-      console.log("Connection closed:", code, reason);
-    });
-
-    this.socket = socket;
   }
 
   startMessageListener(socket) {
     // Message type 7 for join server
     // Message type 19 for message user
     socket.onmessage = (message) => {
-      this.keepAlive(message);
+      this.keepAlive(socket, message);
       const payload = JSON.parse(message.data);
       if (this.listeners[payload.t]) {
         this.listeners[payload.t](payload);
@@ -64,7 +68,7 @@ class SocketService {
     };
   }
 
-  keepAlive(message) {
+  keepAlive(socket, message) {
     const payload = JSON.parse(message.data);
     const { t, event, op, d } = payload;
     switch (op) {
@@ -72,7 +76,7 @@ class SocketService {
       case 10:
         const { heartbeat_interval } = d;
         setInterval(() => {
-          this.socket.send(JSON.stringify({ op: 1, d: null }));
+          socket.send(JSON.stringify({ op: 1, d: null }));
         }, heartbeat_interval);
         break;
     }
