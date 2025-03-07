@@ -43,15 +43,19 @@ class SocketService {
       socket.send(JSON.stringify(identify_payload));
     };
 
-    this.socket = socket;
+    this.startMessageListener(socket);
 
-    this.startMessageListener();
+    socket.on("close", (code, reason) => {
+      console.log("Connection closed:", code, reason);
+    });
+
+    this.socket = socket;
   }
 
-  startMessageListener() {
+  startMessageListener(socket) {
     // Message type 7 for join server
     // Message type 19 for message user
-    this.socket.onmessage = (message) => {
+    socket.onmessage = (message) => {
       this.keepAlive(message);
       const payload = JSON.parse(message.data);
       if (this.listeners[payload.t]) {
@@ -68,7 +72,7 @@ class SocketService {
       case 10:
         const { heartbeat_interval } = d;
         setInterval(() => {
-          this.socket.send(JSON.stringify({ op: 2, d: null }));
+          this.socket.send(JSON.stringify({ op: 1, d: null }));
         }, heartbeat_interval);
         break;
     }
