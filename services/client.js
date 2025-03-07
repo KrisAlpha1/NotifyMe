@@ -25,7 +25,7 @@ client.login(process.env.BOT_TOKEN);
 
 client.on(Events.MessageCreate, async (message) => {
   if (!message.author.bot) {
-    message.reply("Hi there");
+    // message.reply("Hi there");
   }
 });
 
