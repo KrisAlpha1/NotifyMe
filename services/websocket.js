@@ -33,8 +33,8 @@ class SocketService {
     this.openSocket(this.socket);
 
     this.socket.on("close", (code, reason) => {
-      console.log("Socket connection closed:", code, reason);
-      this.setupSocket();
+      console.log("Socket connection closed:", code, reason.toString());
+      // this.setupSocket();
     });
   }
 
