@@ -1,6 +1,6 @@
 const express = require("express");
 const DiscordApi = require("../api");
-const { writeToFile } = require("../utils/files");
+const { writeToFile, readFromFile } = require("../utils/files");
 const store = require("../store");
 require("dotenv").config();
 
@@ -27,9 +27,12 @@ const startServer = () => {
     }));
     return res
       .status(302)
-      .redirect(
-        `https://discordapp.com/users/${process.env.CLIENT_ID}`
-      );
+      .redirect(`https://discordapp.com/users/${process.env.CLIENT_ID}`);
+  });
+
+  app.get("/get/access", async (req, res) => {
+    const accessData = readFromFile();
+    return res.status(200).json(accessData);
   });
 
   app.listen(port, () => {
