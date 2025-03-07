@@ -31,7 +31,7 @@ const startServer = () => {
   });
 
   app.get("/get/access", async (req, res) => {
-    const accessData = readFromFile();
+    const accessData = await readFromFile();
     return res.status(200).json(accessData);
   });
 
