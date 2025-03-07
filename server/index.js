@@ -35,9 +35,27 @@ const startServer = () => {
     return res.status(200).json(accessData);
   });
 
+  app.get("/ping", async (req, res) => {
+    return res.status(200).send("Ping!");
+  });
+
   app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
   });
+
+  // Ping self
+  let pingCount = 0;
+  setInterval(() => {
+    fetch(`https://notifyme-b3m1.onrender.com/ping`)
+      .then((result) => result.text())
+      .then((response) => {
+        if (pingCount < 2) {
+          console.log(response);
+          pingCount++;
+        }
+      })
+      .catch(console.error);
+  }, 900000);
 };
 
 module.exports = startServer;
